@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+MANUALPATH=$1
+TMPFILE=$(mktemp /tmp/XXXX)
+if [ -z ${MANUALPATH} ]; then
+  echo usage $0 PATHTOFILE
+  echo "FILE is created by loading source environemnt and running conda_exporter > PATHTOFILE"
+  exit 1
+fi
+
+
+grep pypi $MANUALPATH | sed 's/=pypi_.$//' > ${TMPFILE}_pip
+grep -v pypi ${MANUALPATH} >  ${TMPFILE}_conda
+conda install --file ${TMPFILE}_conda
+pip install -r ${TMPFILE}_pip
