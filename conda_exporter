@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+MANUALPATH=$1
+if [ -n ${MANUALPATH} ]; then
+  TMPFILE=${MANUALPATH}
+else
+  echo usage $0 PATHTOFILE
+fi
+
+conda list --export  > ${MANUALPATH}
+possible_issues=$(conda list --explicit  | grep ^file)
+if [ -n $possible_issues ];
+then
+  echo The following might cause problems, suggest removing these requirements from $MANUALPATH and trying again
+  conda list --explicit  | grep ^file | xargs -n 1 basename | awk -F \- '{print $1"="$2"="$3}' | sed 's/\.tar.bz2//'
+  exit 1
+fi
