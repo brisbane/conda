@@ -12,5 +12,19 @@ fi
 
 grep pypi $MANUALPATH | sed 's/=pypi_.$//' > ${TMPFILE}_pip
 grep -v pypi ${MANUALPATH} >  ${TMPFILE}_conda
+
+#you might want to try installing through conda
 conda install --file ${TMPFILE}_conda
-pip install -r ${TMPFILE}_pip
+echo "Do you want to try installing previsouly pipped files with conda.  This is a better more maintainable practice if it works! The enviroenment will likely not be idenetical though y/n"
+read allconda
+if [ "$allconda" == "y" || "$allconda" == "Y" ]; then
+  conda install --file ${TMPFILE}_pip
+  if [ $? -eq 1]; then
+     echo "Delete the above requirements from ${TMPFILE}_pip, or add anaconda channels to install that software and run   conda install --file ${TMPFILE}_pip again"
+     echo "You can likely then install the above through pip manually, making the environment slightly more maintainable"
+     exit 1
+  fi
+else
+   sed  -i 's/=/==/' ${TMPFILE}_pip
+   pip install -r ${TMPFILE}_pip
+fi
